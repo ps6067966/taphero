@@ -1,4 +1,4 @@
-package com.marianozorilla.tap_hero
+package com.pm.tap_hero
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.plugin.common.MethodChannel

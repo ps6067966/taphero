@@ -4,12 +4,12 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'button.dart';
+import 'game.dart';
+import 'gamepad.dart';
 import 'particles.dart';
 import 'route.dart';
 import 'utils.dart';
-import 'game.dart';
-import 'gamepad.dart';
-import 'button.dart';
 
 class Welcome extends StatefulWidget {
   const Welcome({super.key});
@@ -18,7 +18,8 @@ class Welcome extends StatefulWidget {
   _WelcomeState createState() => _WelcomeState();
 }
 
-class _WelcomeState extends State<Welcome> with WidgetsBindingObserver, TickerProviderStateMixin {
+class _WelcomeState extends State<Welcome>
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   static AudioPlayer? musicPlayer;
 
   static var musicPlaying = false;
@@ -61,12 +62,16 @@ class _WelcomeState extends State<Welcome> with WidgetsBindingObserver, TickerPr
   }
 
   void playMusic() async {
-    await musicPlayer!.play(AssetSource('audio/welcome.mp3'));
+    if (musicPlayer != null) {
+      await musicPlayer!.play(AssetSource('audio/welcome.mp3'));
+    }
   }
 
   void initAnimation() {
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 3));
-    _animationHero = Tween(begin: 0.0, end: 0.6).animate(CurvedAnimation(parent: _controller, curve: Curves.decelerate))
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 3));
+    _animationHero = Tween(begin: 0.0, end: 0.6)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.decelerate))
       ..addStatusListener((state) {
         if (state == AnimationStatus.completed) {
           setState(() {
@@ -81,7 +86,8 @@ class _WelcomeState extends State<Welcome> with WidgetsBindingObserver, TickerPr
         });
       });
 
-    _animationBoss = Tween(begin: 1.0, end: 0.6).animate(CurvedAnimation(parent: _controller, curve: Curves.decelerate))
+    _animationBoss = Tween(begin: 1.0, end: 0.6)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.decelerate))
       ..addListener(() {
         setState(() {
           bossYAxis = _animationBoss.value;
@@ -92,33 +98,36 @@ class _WelcomeState extends State<Welcome> with WidgetsBindingObserver, TickerPr
   }
 
   void initTapAnimation() {
-    _tapController = AnimationController(vsync: this, duration: const Duration(seconds: 1));
-    _tapAnimation =
-        Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _tapController, curve: Curves.decelerate))
-          ..addStatusListener((status) {
-            if (status == AnimationStatus.completed) {
-              _tapController.reverse();
-            } else if (status == AnimationStatus.dismissed) {
-              _tapController.forward();
-            }
-          })
-          ..addListener(() {
-            setState(() {
-              tapAlpha = _tapAnimation.value;
-            });
-          });
+    _tapController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 1));
+    _tapAnimation = Tween(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(parent: _tapController, curve: Curves.decelerate))
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _tapController.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          _tapController.forward();
+        }
+      })
+      ..addListener(() {
+        setState(() {
+          tapAlpha = _tapAnimation.value;
+        });
+      });
 
-    _fadeController = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+    _fadeController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500));
     _fadeAnimation = ColorTween(begin: Colors.transparent, end: Colors.black)
-        .animate(CurvedAnimation(parent: _fadeController, curve: Curves.decelerate))
-          ..addStatusListener((status) {
-            if (status == AnimationStatus.completed) {
-              Navigator.of(context).pushReplacement(InitRoute(Game()));
-            }
-          })
-          ..addListener(() {
-            fade = _fadeAnimation.value;
-          });
+        .animate(
+            CurvedAnimation(parent: _fadeController, curve: Curves.decelerate))
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          Navigator.of(context).pushReplacement(InitRoute(Game()));
+        }
+      })
+      ..addListener(() {
+        fade = _fadeAnimation.value;
+      });
   }
 
   void disposeAnimations() {
@@ -172,7 +181,7 @@ class _WelcomeState extends State<Welcome> with WidgetsBindingObserver, TickerPr
           var pair = Utils.mapToPair(Map<int, bool>.from(call.arguments));
           setState(() {
             if (pair.value) {
-              switch(GamePad.switchMap[pair.key]) {
+              switch (GamePad.switchMap[pair.key]) {
                 case "A":
                   initGame();
                   break;
@@ -183,7 +192,7 @@ class _WelcomeState extends State<Welcome> with WidgetsBindingObserver, TickerPr
       }
     });
   }
-  
+
   void hideController() {
     Future.delayed(const Duration(seconds: 3), () {
       setState(() {
@@ -274,7 +283,8 @@ class _WelcomeState extends State<Welcome> with WidgetsBindingObserver, TickerPr
             bottom: false,
             child: Container(
               alignment: Alignment.topCenter,
-              padding: EdgeInsets.only(top: constraints.maxHeight * 0.04, left: 15.0, right: 15.0),
+              padding: EdgeInsets.only(
+                  top: constraints.maxHeight * 0.04, left: 15.0, right: 15.0),
               child: Image.asset(
                 logoAsset(),
                 height: 150.0,
@@ -322,19 +332,18 @@ class _WelcomeState extends State<Welcome> with WidgetsBindingObserver, TickerPr
                       height: 20,
                       width: 45,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10, right: 10),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: Text(
-                          _gamepadName!,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontFamily: "Gameplay"
+                    if (_gamepadName != null)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10, right: 10),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: Text(
+                            _gamepadName!,
+                            style: const TextStyle(
+                                fontSize: 12, fontFamily: "Gameplay"),
                           ),
                         ),
-                      ),
-                    )
+                      )
                   ],
                 ),
               ),

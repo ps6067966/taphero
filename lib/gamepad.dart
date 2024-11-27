@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 
 const GAMEPAD_BUTTON_UP = "UP";
@@ -72,15 +74,19 @@ class GamePad {
   }
 
   static Future<String?> get gamepadName async {
-    final String? name = await _channel.invokeMethod("getGamePadName");
-    return name;
+    if (Platform.isLinux || Platform.isWindows) {
+      final String? name = await _channel.invokeMethod("getGamePadName");
+      return name;
+    }
+    return null;
   }
 
   static Map<int, String> get switchMap => SWITCH_PRO_MAPPING;
 
   void setListener({GamePadListener? gamePadListener, String? name}) {
     listener = (RawKeyEvent e) {
-      String evtType = e is RawKeyDownEvent ? GAMEPAD_BUTTON_DOWN : GAMEPAD_BUTTON_UP;
+      String evtType =
+          e is RawKeyDownEvent ? GAMEPAD_BUTTON_DOWN : GAMEPAD_BUTTON_UP;
 
       if (e.data is RawKeyEventDataAndroid) {
         RawKeyEventDataAndroid androidEvent = e.data as RawKeyEventDataAndroid;

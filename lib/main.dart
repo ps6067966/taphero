@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 
-import 'package:flutter/foundation.dart' show debugDefaultTargetPlatformOverride;
+import 'package:flutter/foundation.dart'
+    show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:window_manager/window_manager.dart';
@@ -27,8 +28,9 @@ void _setTargetPlatformForDesktop() {
 
 void _runOnDesktop() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await windowManager.ensureInitialized();
+  if (Platform.isLinux || Platform.isWindows) {
+    await windowManager.ensureInitialized();
+  }
 
   WindowOptions windowOptions = const WindowOptions(
     size: Size(1000, 650),
@@ -51,7 +53,6 @@ class TapHero extends StatefulWidget {
 }
 
 class _TapHeroState extends State<TapHero> {
-
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
